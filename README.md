@@ -1,2 +1,7 @@
 # github-file-explorer
-GiHub file explorer using Vue.js
+GitHub file explorer using Vue.js
+
+| name | age | Position |
+|:---|:---:|---:|
+| Curry | 28 | \| US |
+| Kobe | 37 | US |
