@@ -1,60 +1,126 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://gitter.im/vuejs/vue" target="_blank">Gitter Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <legend>
+          <h2><span class="mega-octicon octicon-mark-github"></span>&nbsp;GitHub 文件浏览器</h2>
+        </legend>
+
+        <!-- prevent 阻止表单提交 -->
+        <form @submit.prevent="getRepo" class="form-inline">
+          <div class="form-group">
+            <label for="Input username">Input username: </label>
+            <input v-model="username" type="text" class="form-control" placeholder="hanzichi">
+          </div>
+          <button class="btn btn-primary" type="submit">search</button>
+        </form>
+        <br/>
+
+        <ol class="breadcrumb">
+          <li><strong>当前路径:</strong></li>
+         <!--  <li><a href="#">Home</a></li>
+          <li><a href="#">Library</a></li>
+          <li class="">Data</li> -->
+          <li v-for="(item, index) in nav">
+            <a v-if="index !== nav.length - 1" href="javascript:;" @click="changeNav($event, index)">{{ item }}</a>
+            <template v-else class="active">{{ item }}</template>
+          </li>
+        </ol>
+
+
+        <table class="table table-hover" v-if="files.length || !code">
+          <tbody>
+            <tr v-for="item in files">
+              <td v-if="item.type === 'dir' || !item.type">
+                <span class="octicon octicon-file-directory"></span>
+                <a href="javascript:;" @click="changePath($event)">{{ item.name }}</a>
+              </td>
+              <td v-else>
+                <span class="octicon octicon-file-text"></span>
+                <a href="javascript:;" @click="changePath($event)">{{ item.name }}</a>
+              </td>
+              <td class="text-right">
+                <a download :href="item.download_url" v-if="item.type === 'file'">
+                  <span class="octicon octicon-cloud-download"></span>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pre v-else>{{ code }}</pre>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  name: 'app',
-  data () {
+  data() {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      files: [],
+      nav: [],
+      username: '',
+      code: ''
+    }
+  },
+
+  methods: {
+    // 输入框
+    getRepo() {
+      this.nav = [];  // reset
+      this.nav.push(this.username);
+    },
+
+    // 导航栏
+    changeNav(e, index) {
+      this.nav = this.nav.slice(0, index + 1);
+    },
+
+    // list
+    changePath(e) {
+      let val = e.target.innerHTML;
+      this.nav.push(val);
+    },
+
+    sortFiles() {
+      if (!('type' in this.files[0]))
+        return;
+
+      this.files.sort((a, b) => {
+        // file, dir
+        if (a.type !== b.type)
+          return a.type > b.type;
+        else
+          return a.name > b.name;
+      });
+    }
+  },
+
+  watch: {
+    nav() {
+      let api;
+
+      if (this.nav.length === 1)
+        api = 'https://api.github.com/users/' + this.nav[0] + '/repos';
+      else {
+        let a = this.nav.slice(0, 2);
+        let b = this.nav.slice(2);
+        api = 'https://api.github.com/repos/' + a.join('/') + '/contents/' + b.join('/');
+      }
+
+      axios.get(api).then((res) => {
+        if (res.data.content) {
+          this.files = [];
+          this.code = decodeURIComponent(escape(window.atob(res.data.content)));
+          console.log(this.code)
+        } else {
+          this.files = res.data;
+          this.sortFiles();
+        }
+      });
     }
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
-</style>
