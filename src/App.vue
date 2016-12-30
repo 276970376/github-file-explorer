@@ -24,6 +24,10 @@
           </li>
         </ol>
 
+
+        <div class="loader loader-default" :class="{'is-active': isLoading}"></div>
+
+        <!-- loading, files, or code -->
         <table class="table table-hover" v-if="files.length || !code">
           <tbody>
             <tr v-for="item in files">
@@ -58,15 +62,22 @@ export default {
       files: [],
       nav: [],
       username: '',
-      code: ''
+      code: '',
+      isLoading: false
     }
   },
 
   methods: {
     // 输入框
     getRepo() {
-      this.nav = [];  // reset
-      this.nav.push(this.username);
+      let username = this.username.trim();
+
+      if (username === '')
+        alert('请输入用户名');
+      else {
+        this.nav = [];  // reset
+        this.nav.push(username);
+      }
     },
 
     // 导航栏
@@ -104,6 +115,8 @@ export default {
 
   watch: {
     nav() {
+      this.isLoading = true;
+
       let api;
 
       if (this.nav.length === 1)
@@ -124,8 +137,14 @@ export default {
           this.sortFiles();
           // console.log(this.files)
         }
+
+        this.isLoading = false;
       });
     }
   }
 }
 </script>
+
+<style>
+@import '../node_modules/pure-css-loader/dist/css-loader.css';
+</style>
