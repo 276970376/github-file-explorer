@@ -18,15 +18,11 @@
 
         <ol class="breadcrumb">
           <li><strong>当前路径:</strong></li>
-         <!--  <li><a href="#">Home</a></li>
-          <li><a href="#">Library</a></li>
-          <li class="">Data</li> -->
           <li v-for="(item, index) in nav">
             <a v-if="index !== nav.length - 1" href="javascript:;" @click="changeNav($event, index)">{{ item }}</a>
             <template v-else class="active">{{ item }}</template>
           </li>
         </ol>
-
 
         <table class="table table-hover" v-if="files.length || !code">
           <tbody>
@@ -88,13 +84,25 @@ export default {
       if (!('type' in this.files[0]))
         return;
 
+      // console.log(this.files)
+
       this.files.sort((a, b) => {
         // file, dir
-        if (a.type !== b.type)
-          return a.type > b.type;
-        else
-          return a.name > b.name;
+        // sort 有坑，注意
+        if (a.type !== b.type) {
+          if (a.type > b.type)
+            return 1;
+          else
+            return -1;
+        } else {
+          if (a.name > b.name)
+            return 1;
+          else
+            return -1;
+        }
       });
+
+      // console.log(this.files)
     }
   },
 
@@ -114,10 +122,11 @@ export default {
         if (res.data.content) {
           this.files = [];
           this.code = decodeURIComponent(escape(window.atob(res.data.content)));
-          console.log(this.code)
+          // console.log(this.code)
         } else {
           this.files = res.data;
           this.sortFiles();
+          // console.log(this.files)
         }
       });
     }
