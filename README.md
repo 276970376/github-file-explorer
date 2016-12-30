@@ -1,5 +1,10 @@
 # github-file-explorer
 
+## Online demo
+
+<http://hanzichi.github.io/2016/github-file-explorer/>
+
+
 ## Usage
 
 1. `npm install`
