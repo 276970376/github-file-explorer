@@ -84,8 +84,6 @@ export default {
       if (!('type' in this.files[0]))
         return;
 
-      // console.log(this.files)
-
       this.files.sort((a, b) => {
         // file, dir
         // sort 有坑，注意
@@ -101,8 +99,6 @@ export default {
             return -1;
         }
       });
-
-      // console.log(this.files)
     }
   },
 
