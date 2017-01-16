@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="row">
+      <!-- {{ nav }} -->
       <div class="col-md-12">
         <legend>
           <h2><span class="mega-octicon octicon-mark-github"></span>&nbsp;GitHub 文件浏览器</h2>
@@ -18,7 +19,8 @@
         <br/>
 
         <!-- 子组件 -->
-        <list :nav="nav"></list>
+        <list :my-nav="nav"></list>
+        <!-- <list :myNav="nav"></list> -->
       </div>
     </div>
   </div>

@@ -2,8 +2,8 @@
   <div>
     <ol class="breadcrumb">
       <li><strong>当前路径:</strong></li>
-      <li v-for="(item, index) of nav">
-        <a v-if="index !== nav.length - 1" href="javascript:;" @click="changeNav($event, index)">{{ item }}</a>
+      <li v-for="(item, index) of myNav">
+        <a v-if="index !== myNav.length - 1" href="javascript:;" @click="changeNav($event, index)">{{ item }}</a>
         <template v-else class="active">{{ item }}</template>
       </li>
     </ol>
@@ -43,7 +43,7 @@
 import axios from 'axios';
 
 export default {
-  props: ['nav'],
+  props: ['myNav'],
 
   data() {
     return {
@@ -56,13 +56,13 @@ export default {
   methods: {
     // 导航栏
     changeNav(e, index) {
-      this.nav = this.nav.slice(0, index + 1);
+      this.myNav = this.myNav.slice(0, index + 1);
     },
 
     // list
     changePath(e) { // 不需要传入 e 参数，默认
       let val = e.target.innerHTML;
-      this.nav.push(val);
+      this.myNav.push(val);
     },
 
     sortFiles() {
@@ -92,18 +92,18 @@ export default {
   },
 
   watch: {
-    nav(newVal, oldVal) {
+    myNav(newVal, oldVal) {
       // console.log(newVal, oldVal);
 
       this.isLoading = true;
 
       let api;
 
-      if (this.nav.length === 1)
-        api = 'https://api.github.com/users/' + this.nav[0] + '/repos';
+      if (this.myNav.length === 1)
+        api = 'https://api.github.com/users/' + this.myNav[0] + '/repos';
       else {
-        let a = this.nav.slice(0, 2);
-        let b = this.nav.slice(2);
+        let a = this.myNav.slice(0, 2);
+        let b = this.myNav.slice(2);
         api = 'https://api.github.com/repos/' + a.join('/') + '/contents/' + b.join('/');
       }
 
@@ -126,7 +126,7 @@ export default {
           // alert(msg)
           if (msg.indexOf('404') !== -1) {
             this.openAlertBox('请输入正确的用户名');
-            // this.nav.pop();
+            // this.myNav.pop();
           }
           else if (msg.indexOf('403') !== -1)
             this.openAlertBox('请求太频繁受限了！')
